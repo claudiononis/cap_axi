@@ -1,0 +1,35 @@
+{
+  "name": "cap_axi",
+  "version": "1.0.0",
+  "description": "A simple CAP project with Fiori app integration",
+  "private": true,
+  "dependencies": {
+    "@sap/cds": "^9",
+    "better-sqlite3": "^12.4.1",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2"
+  },
+  "scripts": {
+    "start": "cds watch",
+    "watch-simulatefiori": "cds watch --open simulatefiori/webapp/index.html?sap-ui-xx-viewCache=false",
+    "build-app": "cd app/simulatefiori && npm run build && cd ../.. && cds watch"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "model": ["db", "srv"],
+        "credentials": {
+          "database": "db/axi.db"
+        }
+      }
+    },
+    "serve": {
+      "app": "app",
+    "static": "app"
+    }
+  }
+}
+

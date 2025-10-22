@@ -1,0 +1,47 @@
+<mvc:View controllerName="simulate.simulatefiori.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}">
+        <content>
+            <VBox class="sapUiSmallMargin sapUiNoContentPadding">
+                
+                <Panel headerText="Parámetros Generales" class="sapUiNoContentPadding">
+                    <content>
+                        <VBox class="sapUiSmallMargin">
+                            <Input id="tenantId" placeholder="Tenant ID (ej. ACME_AR)" />
+                            <DatePicker id="postingDate"
+                                placeholder="Fecha de Contabilización"
+                                displayFormat="yyyy-MM-dd" />
+                            <Input id="coef" placeholder="Coeficiente (ej. 1.25)" type="Number" />
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <Panel headerText="Datos del ítem" class="sapUiNoContentPadding sapUiMediumMarginTop">
+                    <content>
+                        <VBox class="sapUiSmallMargin">
+                            <Input id="gl" placeholder="Cuenta GL (ej. 150000)" />
+                            <Input id="amount" placeholder="Importe (ej. 10000000)" type="Number" />
+                            <Input id="segment" placeholder="Segmento (ej. SEG01)" />
+                            <Input id="costCenter" placeholder="Centro de costo (ej. CC001)" />
+                            <Input id="profitCenter" placeholder="Centro de beneficio (ej. PC001)" />
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <HBox class="sapUiMediumMarginTop" justifyContent="Center">
+                    <Button text="Simular" press=".onSimulate" type="Emphasized" />
+                </HBox>
+
+                <Panel headerText="Resultado" class="sapUiMediumMarginTop">
+                    <content>
+                        <Text id="result" text="Ejecutá la simulación para ver el resultado." 
+                              wrapping="true"
+                              class="sapUiSmallMarginTop" />
+                    </content>
+                </Panel>
+
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>
