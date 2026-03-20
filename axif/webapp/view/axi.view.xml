@@ -1,0 +1,34 @@
+<mvc:View
+    controllerName="axi.axif.controller.axi"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="page" showHeader="false" enableScrolling="false">
+        <content>
+            <OverflowToolbar design="Transparent" class="sapUiResponsiveContentPadding sapUiTinyMarginTop">
+                <Button
+                    text="Cockpit"
+                    type="{= ${shell>/selectedKey} === 'cockpit' ? 'Emphasized' : 'Transparent' }"
+                    press=".onNavigateToCockpit" />
+                <Button
+                    text="Methods"
+                    type="{= ${shell>/selectedKey} === 'methods' ? 'Emphasized' : 'Transparent' }"
+                    press=".onNavigateToMethods" />
+                <Button
+                    text="Indexes"
+                    type="{= ${shell>/selectedKey} === 'indexes' ? 'Emphasized' : 'Transparent' }"
+                    press=".onNavigateToIndexes" />
+                <Button
+                    text="Accounts"
+                    type="{= ${shell>/selectedKey} === 'accounts' ? 'Emphasized' : 'Transparent' }"
+                    press=".onNavigateToAccounts" />
+            </OverflowToolbar>
+
+            <NavContainer id="moduleNav" initialPage="cockpitModule">
+                <mvc:XMLView id="cockpitModule" viewName="axi.axif.view.Cockpit" />
+                <mvc:XMLView id="methodsModule" viewName="axi.axif.view.Methods" />
+                <mvc:XMLView id="indexesModule" viewName="axi.axif.view.Indexes" />
+                <mvc:XMLView id="accountsModule" viewName="axi.axif.view.Accounts" />
+            </NavContainer>
+        </content>
+    </Page>
+</mvc:View>

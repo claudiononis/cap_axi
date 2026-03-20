@@ -1,0 +1,178 @@
+{
+  "_version": "1.65.0",
+  "sap.app": {
+    "id": "axi.axif",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.18.4",
+      "toolsId": "35cc5574-087d-4bbf-95d4-837d01a79de2"
+    },
+    "dataSources": {
+      "methodsService": {
+        "uri": "/sap/opu/odata/sap/ZUI_AXI_METHOD_O2/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "indexesService": {
+        "uri": "/sap/opu/odata/sap/ZUI_AXI_INDEX_O2/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "accountRulesService": {
+        "uri": "/sap/opu/odata/sap/ZUI_AXI_ACC_RULE_O2/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "cockpitService": {
+        "uri": "/sap/opu/odata/sap/ZUI_AXI_COCKPIT_O2/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.145.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "axi.axif.i18n.i18n"
+        }
+      },
+      "accountsService": {
+        "dataSource": "accountRulesService",
+        "preload": true,
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "useBatch": false
+        }
+      },
+      "methodsService": {
+        "dataSource": "methodsService",
+        "preload": true,
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "useBatch": false
+        }
+      },
+      "indexesService": {
+        "dataSource": "indexesService",
+        "preload": true,
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "useBatch": false
+        }
+      },
+      "cockpitService": {
+        "dataSource": "cockpitService",
+        "preload": true,
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "useBatch": false
+        }
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "axi.axif.view",
+        "async": true,
+        "viewPath": "axi.axif.view"
+      },
+      "routes": [
+        {
+          "name": "home",
+          "pattern": "",
+          "target": "Targetaxi"
+        },
+        {
+          "name": "methods",
+          "pattern": "methods",
+          "target": "Targetaxi"
+        },
+        {
+          "name": "indexes",
+          "pattern": "indexes",
+          "target": "Targetaxi"
+        },
+        {
+          "name": "accounts",
+          "pattern": "accounts",
+          "target": "Targetaxi"
+        },
+        {
+          "name": "cockpit",
+          "pattern": "cockpit",
+          "target": "Targetaxi"
+        }
+      ],
+      "targets": {
+        "Targetaxi": {
+          "id": "axi",
+          "name": "axi"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "axi.axif.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "companyCodes": [
+    {
+      "companyCode": "AR10",
+      "name": "Argentina Local 10",
+      "country": "AR",
+      "ledgers": ["0L", "2L"]
+    },
+    {
+      "companyCode": "AR20",
+      "name": "Argentina Local 20",
+      "country": "AR",
+      "ledgers": ["0L"]
+    },
+    {
+      "companyCode": "CL10",
+      "name": "Chile Local 10",
+      "country": "CL",
+      "ledgers": ["2L"]
+    },
+    {
+      "companyCode": "CL20",
+      "name": "Chile Local 20",
+      "country": "CL",
+      "ledgers": ["0L", "2L"]
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+<mvc:View
+    controllerName="axi.axif.controller.Indexes"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page showHeader="false" enableScrolling="true" busy="{indexesView>/busy}">
+        <content>
+            <VBox class="sapUiResponsiveContentPadding sapUiMediumMarginBottom">
+                <OverflowToolbar class="sapUiTinyMarginBottom">
+                    <Title text="Indexes" level="H3" />
+                    <ToolbarSpacer />
+                    <Button text="Nueva serie" press=".onCreateSeries" />
+                    <Button
+                        text="Editar"
+                        press=".onEditSeries"
+                        enabled="{= ${indexesView>/selectedSeriesIndex} > -1 &amp;&amp; !${indexesView>/editMode} }" />
+                    <Button text="Guardar" type="Emphasized" press=".onSaveSeries" enabled="{indexesView>/editMode}" />
+                    <Button text="Cancelar" press=".onCancelEdit" enabled="{indexesView>/editMode}" />
+                </OverflowToolbar>
+
+                <MessageStrip
+                    text="Mantenimiento de series de indices AxI consumiendo OData. Para series existentes, la cabecera ya persiste en backend y los periodos quedan limitados por la API actual."
+                    type="Information"
+                    showIcon="true"
+                    class="sapUiTinyMarginBottom" />
+
+                <FlexBox wrap="Wrap" alignItems="Start">
+                    <Panel headerText="Series de inflacion" width="24rem" class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                        <List
+                            id="seriesList"
+                            mode="SingleSelectMaster"
+                            includeItemInSelection="true"
+                            selectionChange=".onSeriesSelectionChange"
+                            items="{indexes>/series}">
+                            <ObjectListItem
+                                title="{indexes>code}"
+                                intro="{indexes>country}"
+                                number="{indexes>periodicity}"
+                                numberUnit="Freq."
+                                type="Active">
+                                <firstStatus>
+                                    <ObjectStatus
+                                        text="{= ${indexes>active} ? 'Activa' : 'Inactiva' }"
+                                        state="{= ${indexes>active} ? 'Success' : 'Warning' }" />
+                                </firstStatus>
+                                <attributes>
+                                    <ObjectAttribute text="{indexes>name}" />
+                                </attributes>
+                            </ObjectListItem>
+                        </List>
+                    </Panel>
+
+                    <VBox width="100%" class="sapUiSmallMarginBottom">
+                        <Panel headerText="Detalle de la serie" class="sapUiSmallMarginBottom">
+                            <VBox class="sapUiSmallMargin">
+                                <HBox wrap="Wrap" justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                                        <Title text="Cabecera de serie" level="H5" />
+                                        <Text text="Serie usada por AxI para validar periodos y estado de inflacion." />
+                                    </VBox>
+                                    <HBox wrap="Wrap" class="sapUiTinyMarginTop">
+                                        <ObjectStatus
+                                            text="{= ${indexesView>/currentSeries/active} ? 'Serie activa' : 'Serie inactiva' }"
+                                            state="{= ${indexesView>/currentSeries/active} ? 'Success' : 'Warning' }"
+                                            class="sapUiSmallMarginEnd sapUiTinyMarginBottom" />
+                                        <ObjectStatus
+                                            text="{= ${indexesView>/editMode} ? 'Modo edicion' : 'Modo visualizacion' }"
+                                            state="{= ${indexesView>/editMode} ? 'Information' : 'None' }"
+                                            class="sapUiTinyMarginBottom" />
+                                    </HBox>
+                                </HBox>
+
+                                <HBox wrap="Wrap" renderType="Bare">
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="14rem">
+                                        <Label text="Code" required="true" />
+                                        <Input value="{indexesView>/currentSeries/code}" editable="{indexesView>/editMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="20rem">
+                                        <Label text="Name" required="true" />
+                                        <Input value="{indexesView>/currentSeries/name}" editable="{indexesView>/editMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                        <Label text="Country" required="true" />
+                                        <Input value="{indexesView>/currentSeries/country}" editable="{indexesView>/editMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                        <Label text="Periodicity" required="true" />
+                                        <Input value="{indexesView>/currentSeries/periodicity}" editable="{indexesView>/editMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="10rem">
+                                        <Label text="Active" />
+                                        <Switch state="{indexesView>/currentSeries/active}" enabled="{indexesView>/editMode}" />
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+                        </Panel>
+
+                        <Panel headerText="Periodos mensuales">
+                            <VBox class="sapUiSmallMargin">
+                                <OverflowToolbar class="sapUiTinyMarginBottom">
+                                    <Title text="Valores por periodo" level="H5" />
+                                    <ToolbarSpacer />
+                                    <Button text="Agregar periodo" press=".onCreatePeriod" enabled="{indexesView>/editMode}" />
+                                    <Button
+                                        text="Editar periodo"
+                                        press=".onEditPeriod"
+                                        enabled="{= ${indexesView>/editMode} &amp;&amp; ${indexesView>/selectedPeriodIndex} > -1 &amp;&amp; !${indexesView>/periodEditMode} }" />
+                                    <Button
+                                        text="Eliminar periodo"
+                                        press=".onDeletePeriod"
+                                        enabled="{= ${indexesView>/editMode} &amp;&amp; ${indexesView>/selectedPeriodIndex} > -1 }" />
+                                </OverflowToolbar>
+
+                                <Text
+                                    text="Formato de periodo: YYYY-MM. Al guardar se valida secuencia mensual sin huecos y sin duplicados."
+                                    class="sapUiTinyMarginBottom" />
+
+                                <Table
+                                    id="periodTable"
+                                    mode="SingleSelectLeft"
+                                    includeItemInSelection="true"
+                                    selectionChange=".onPeriodSelectionChange"
+                                    items="{indexesView>/currentSeries/values}">
+                                    <columns>
+                                        <Column>
+                                            <Text text="Periodo" />
+                                        </Column>
+                                        <Column hAlign="End">
+                                            <Text text="Valor" />
+                                        </Column>
+                                        <Column hAlign="Center">
+                                            <Text text="Estado" />
+                                        </Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Text text="{indexesView>period}" />
+                                                <ObjectNumber number="{indexesView>value}" unit="idx" />
+                                                <ObjectStatus
+                                                    text="{= ${indexesView>active} ? 'Activo' : 'Inactivo' }"
+                                                    state="{= ${indexesView>active} ? 'Success' : 'Warning' }" />
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+
+                                <Title text="Detalle de periodo" level="H5" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
+                                <HBox wrap="Wrap" renderType="Bare">
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                        <Label text="Periodo" required="true" />
+                                        <Input
+                                            value="{indexesView>/currentPeriod/period}"
+                                            editable="{indexesView>/periodEditMode}"
+                                            placeholder="YYYY-MM" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                        <Label text="Valor" required="true" />
+                                        <Input
+                                            value="{indexesView>/currentPeriod/value}"
+                                            editable="{indexesView>/periodEditMode}"
+                                            type="Number" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="10rem">
+                                        <Label text="Activo" />
+                                        <Switch
+                                            state="{indexesView>/currentPeriod/active}"
+                                            enabled="{indexesView>/periodEditMode}" />
+                                        <ObjectStatus
+                                            text="{= ${indexesView>/currentPeriod/active} ? 'Activo' : 'Inactivo' }"
+                                            state="{= ${indexesView>/currentPeriod/active} ? 'Success' : 'Warning' }"
+                                            class="sapUiTinyMarginTop" />
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+                        </Panel>
+                    </VBox>
+                </FlexBox>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

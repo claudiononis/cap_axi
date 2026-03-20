@@ -1,0 +1,269 @@
+<mvc:View
+    controllerName="axi.axif.controller.Cockpit"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+    <Page showHeader="false" enableScrolling="true" busy="{cockpitView>/busy}">
+        <content>
+            <VBox class="sapUiResponsiveContentPadding sapUiMediumMarginBottom axiCockpitPage">
+                <OverflowToolbar class="sapUiTinyMarginBottom">
+                    <Title text="Cockpit" level="H3" />
+                    <ToolbarSpacer />
+                    <Button
+                        text="Simular"
+                        type="Emphasized"
+                        press=".onSimulateRun"
+                        enabled="{= ${cockpitView>/derivedMethod/methodId} ? true : false }" />
+                    <Button
+                        text="Contabilizar"
+                        press=".onPostRun"
+                        enabled="{= ${cockpitView>/executionMode} === 'UPDATE' &amp;&amp; ${cockpitView>/draftRun/status} === 'SIMULATED' }" />
+                    <Button
+                        text="Revertir"
+                        press=".onReverseRun"
+                        enabled="{= ${cockpitView>/selectedRun/status} === 'POSTED' }" />
+                </OverflowToolbar>
+
+                <MessageStrip
+                    text="Cockpit AxI consumiendo OData real: crea corridas, ejecuta acciones por RUN_ID y relee auditoria con to_Items."
+                    type="Information"
+                    showIcon="true"
+                    class="sapUiTinyMarginBottom" />
+
+                <HBox wrap="Wrap" class="sapUiTinyMarginBottom">
+                    <GenericTile header="Total runs" subheader="Auditados">
+                        <TileContent>
+                            <NumericContent value="{cockpitView>/summary/total}" />
+                        </TileContent>
+                    </GenericTile>
+                    <GenericTile header="Simulated" subheader="Pendientes" class="sapUiTinyMarginBegin">
+                        <TileContent>
+                            <NumericContent value="{cockpitView>/summary/simulated}" valueColor="Information" />
+                        </TileContent>
+                    </GenericTile>
+                    <GenericTile header="Posted" subheader="Contabilizados" class="sapUiTinyMarginBegin">
+                        <TileContent>
+                            <NumericContent value="{cockpitView>/summary/posted}" valueColor="Good" />
+                        </TileContent>
+                    </GenericTile>
+                    <GenericTile header="Failed" subheader="Con error" class="sapUiTinyMarginBegin">
+                        <TileContent>
+                            <NumericContent value="{cockpitView>/summary/failed}" valueColor="Error" />
+                        </TileContent>
+                    </GenericTile>
+                </HBox>
+
+                <Panel headerText="Corrida AxI" class="sapUiSmallMarginBottom">
+                    <VBox class="sapUiSmallMargin">
+                        <HBox wrap="Wrap" renderType="Bare">
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="16rem">
+                                <Label text="Sociedad" required="true" />
+                                <Select selectedKey="{cockpitView>/filters/companyCode}" change=".onSelectionChange" width="100%" items="{companyCodes>/companyCodes}">
+                                    <items>
+                                        <core:Item key="{companyCodes>companyCode}" text="{= ${companyCodes>companyCode} + ' - ' + ${companyCodes>name} }" />
+                                    </items>
+                                </Select>
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                <Label text="Fecha de corrida" required="true" />
+                                <DatePicker
+                                    value="{cockpitView>/filters/runDate}"
+                                    valueFormat="yyyy-MM-dd"
+                                    displayFormat="medium"
+                                    change=".onSelectionChange" />
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                <Label text="Fecha contabilizacion" required="true" />
+                                <DatePicker
+                                    value="{cockpitView>/filters/postingDate}"
+                                    valueFormat="yyyy-MM-dd"
+                                    displayFormat="medium"
+                                    change=".onSelectionChange" />
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="10rem">
+                                <Label text="Ejercicio" required="true" />
+                                <Input value="{cockpitView>/filters/fiscalYear}" liveChange=".onSelectionChange" />
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="10rem">
+                                <Label text="Periodo" required="true" />
+                                <Input value="{cockpitView>/filters/fiscalPeriod}" liveChange=".onSelectionChange" />
+                            </VBox>
+                        </HBox>
+
+                        <HBox wrap="Wrap" renderType="Bare">
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="14rem">
+                                <Label text="Modo de ejecucion" />
+                                <Select selectedKey="{cockpitView>/executionMode}">
+                                    <items>
+                                        <core:Item key="TEST" text="TEST" />
+                                        <core:Item key="UPDATE" text="UPDATE" />
+                                    </items>
+                                </Select>
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="16rem">
+                                <Label text="Tipo de corrida" />
+                                <Select selectedKey="{cockpitView>/runType}">
+                                    <items>
+                                        <core:Item key="MONTHLY" text="Mensual" />
+                                        <core:Item key="YEAR_END" text="Cierre anual" />
+                                    </items>
+                                </Select>
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="14rem">
+                                <Label text="Usuario tecnico" />
+                                <Input value="{cockpitView>/triggeredBy}" editable="false" />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </Panel>
+
+                <Panel headerText="Metodo derivado" class="sapUiSmallMarginBottom">
+                    <VBox class="sapUiSmallMargin">
+                        <HBox wrap="Wrap" justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
+                            <Text text="{cockpitView>/derivationMessage}" />
+                            <ObjectStatus
+                                text="{= ${cockpitView>/derivedMethod/methodId} ? 'Metodo derivado' : 'Sin metodo derivado' }"
+                                state="{= ${cockpitView>/derivedMethod/methodId} ? 'Success' : 'Warning' }" />
+                        </HBox>
+
+                        <HBox wrap="Wrap" renderType="Bare">
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                <Label text="Method ID" />
+                                <Input value="{cockpitView>/derivedMethod/methodId}" editable="false" />
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="22rem">
+                                <Label text="Descripcion" />
+                                <Input value="{cockpitView>/derivedMethod/description}" editable="false" />
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="10rem">
+                                <Label text="Ledger" />
+                                <Input value="{cockpitView>/derivedMethod/ledger}" editable="false" />
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                <Label text="Index Series" />
+                                <Input value="{cockpitView>/derivedMethod/indexSeries}" editable="false" />
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="10rem">
+                                <Label text="Doc Type" />
+                                <Input value="{cockpitView>/derivedMethod/documentType}" editable="false" />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </Panel>
+
+                <Panel headerText="Simulacion y resultado" class="sapUiSmallMarginBottom">
+                    <VBox class="sapUiSmallMargin">
+                        <HBox wrap="Wrap" justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
+                            <Text text="Resultado de simulacion devuelto por el servicio Cockpit AxI." />
+                            <ObjectStatus
+                                text="{= ${cockpitView>/draftRun/id} ? ${cockpitView>/draftRun/id} : 'Sin corrida simulada' }"
+                                state="{= ${cockpitView>/draftRun/id} ? 'Information' : 'None' }" />
+                        </HBox>
+
+                        <Table items="{cockpitView>/simulationEntries}" growing="true" width="auto">
+                            <columns>
+                                <Column>
+                                    <Text text="Cuenta" />
+                                </Column>
+                                <Column hAlign="End">
+                                    <Text text="Saldo base" />
+                                </Column>
+                                <Column hAlign="End">
+                                    <Text text="% AxI" />
+                                </Column>
+                                <Column hAlign="End">
+                                    <Text text="Ajuste" />
+                                </Column>
+                                <Column>
+                                    <Text text="Cuenta AxI" />
+                                </Column>
+                                <Column>
+                                    <Text text="Cuenta puente" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <ObjectIdentifier title="{cockpitView>glAccount}" text="{cockpitView>description}" />
+                                        <ObjectNumber number="{cockpitView>baseBalance}" unit="ARS" />
+                                        <ObjectNumber number="{cockpitView>adjustmentPercent}" unit="%" />
+                                        <ObjectNumber number="{cockpitView>adjustmentAmount}" unit="ARS" />
+                                        <Text text="{cockpitView>adjustmentAccount}" />
+                                        <Text text="{cockpitView>offsetAccount}" />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+
+                        <HBox wrap="Wrap" class="sapUiSmallMarginTop">
+                            <ObjectStatus
+                                text="{= 'Total ajuste: ' + ${cockpitView>/simulationTotals/totalAdjustment} + ' ARS' }"
+                                state="Information"
+                                class="sapUiSmallMarginEnd sapUiTinyMarginBottom" />
+                            <ObjectStatus
+                                text="{= 'RECPAM mock: ' + ${cockpitView>/simulationTotals/recpam} + ' ARS' }"
+                                state="Success"
+                                class="sapUiTinyMarginBottom" />
+                        </HBox>
+                    </VBox>
+                </Panel>
+
+                <Panel headerText="Auditoria de corridas" class="sapUiSmallMarginBottom">
+                    <VBox class="sapUiSmallMargin">
+                        <Table
+                            id="runsTable"
+                            mode="SingleSelectLeft"
+                            includeItemInSelection="true"
+                            selectionChange=".onRunSelectionChange"
+                            items="{runs>/runs}">
+                            <columns>
+                                <Column>
+                                    <Text text="RUN_ID" />
+                                </Column>
+                                <Column>
+                                    <Text text="Sociedad" />
+                                </Column>
+                                <Column>
+                                    <Text text="Periodo" />
+                                </Column>
+                                <Column>
+                                    <Text text="Metodo" />
+                                </Column>
+                                <Column hAlign="Center">
+                                    <Text text="Estado" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <ObjectIdentifier title="{runs>id}" text="{runs>executedAt}" />
+                                        <Text text="{runs>companyCode}" />
+                                        <Text text="{= ${runs>fiscalYear} + '/' + ${runs>fiscalPeriod} }" />
+                                        <Text text="{runs>methodId}" />
+                                        <ObjectStatus
+                                            text="{ path: 'runs>status', formatter: '.formatter.statusText' }"
+                                            state="{ path: 'runs>status', formatter: '.formatter.statusState' }" />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+
+                        <Title text="Detalle de auditoria" level="H5" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
+                        <HBox wrap="Wrap" renderType="Bare">
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="16rem">
+                                <Label text="Request backend" />
+                                <TextArea value="{cockpitView>/selectedRun/requestPayload}" editable="false" rows="7" />
+                            </VBox>
+                            <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="16rem">
+                                <Label text="Response backend" />
+                                <TextArea value="{cockpitView>/selectedRun/responsePayload}" editable="false" rows="7" />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </Panel>
+
+                <Toolbar design="Transparent" class="axiBottomSpacer" />
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

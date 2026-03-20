@@ -1,0 +1,62 @@
+{
+  "methods": [
+    {
+      "methodId": "INF_ARS_01",
+      "description": "Metodo de inflacion para Argentina ledger principal",
+      "country": "AR",
+      "ledger": "0L",
+      "indexSeries": "IPC_AR",
+      "documentType": "YI",
+      "monthlyReversal": true,
+      "yearEndNoReversal": false,
+      "active": true,
+      "validFrom": "2025-01-01",
+      "validTo": "2025-12-31",
+      "assignments": [
+        {
+          "companyCode": "AR10",
+          "methodId": "INF_ARS_01",
+          "active": true,
+          "validFrom": "2025-01-01",
+          "validTo": "2025-06-30"
+        },
+        {
+          "companyCode": "AR20",
+          "methodId": "INF_ARS_01",
+          "active": true,
+          "validFrom": "2025-01-01",
+          "validTo": "2025-12-31"
+        }
+      ]
+    },
+    {
+      "methodId": "INF_CLP_01",
+      "description": "Metodo de inflacion para Chile ledger local",
+      "country": "CL",
+      "ledger": "2L",
+      "indexSeries": "IPC_CL",
+      "documentType": "YC",
+      "monthlyReversal": false,
+      "yearEndNoReversal": true,
+      "active": true,
+      "validFrom": "2025-07-01",
+      "validTo": "2026-06-30",
+      "assignments": [
+        {
+          "companyCode": "CL10",
+          "methodId": "INF_CLP_01",
+          "active": true,
+          "validFrom": "2025-07-01",
+          "validTo": "2026-06-30"
+        },
+        {
+          "companyCode": "CL20",
+          "methodId": "INF_CLP_01",
+          "active": false,
+          "validFrom": "2026-01-01",
+          "validTo": "2026-12-31"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+<mvc:View
+    controllerName="axi.axif.controller.Methods"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page showHeader="false" enableScrolling="true" busy="{methodsView>/busy}">
+        <content>
+            <VBox class="sapUiResponsiveContentPadding sapUiMediumMarginBottom">
+                <OverflowToolbar class="sapUiTinyMarginBottom">
+                    <Title text="Methods" level="H3" />
+                    <ToolbarSpacer />
+                    <Button text="Nuevo metodo" press=".onCreateMethod" />
+                    <Button
+                        text="Editar"
+                        press=".onEditMethod"
+                        enabled="{= ${methodsView>/selectedMethodIndex} > -1 &amp;&amp; !${methodsView>/editMode} }" />
+                    <Button text="Guardar" type="Emphasized" press=".onSaveMethod" enabled="{methodsView>/editMode}" />
+                    <Button text="Cancelar" press=".onCancelEdit" enabled="{methodsView>/editMode}" />
+                </OverflowToolbar>
+
+                <MessageStrip
+                    text="Mantenimiento de metodos AxI consumiendo OData. Para metodos existentes, la cabecera ya persiste en backend y las asignaciones quedan limitadas por la API actual."
+                    type="Information"
+                    showIcon="true"
+                    class="sapUiTinyMarginBottom" />
+
+                <FlexBox wrap="Wrap" alignItems="Start">
+                    <Panel headerText="Lista de metodos" width="23rem" class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                        <List
+                            id="methodsList"
+                            mode="SingleSelectMaster"
+                            includeItemInSelection="true"
+                            selectionChange=".onMethodSelectionChange"
+                            items="{methods>/methods}">
+                            <ObjectListItem
+                                title="{methods>methodId}"
+                                intro="{methods>country}"
+                                number="{methods>ledger}"
+                                numberUnit="Ledger"
+                                type="Active">
+                                <firstStatus>
+                                    <ObjectStatus
+                                        text="{= ${methods>active} ? 'Activo' : 'Inactivo' }"
+                                        state="{= ${methods>active} ? 'Success' : 'Warning' }" />
+                                </firstStatus>
+                                <attributes>
+                                    <ObjectAttribute text="{methods>description}" />
+                                </attributes>
+                            </ObjectListItem>
+                        </List>
+                    </Panel>
+
+                    <VBox width="100%" class="sapUiSmallMarginBottom">
+                        <Panel headerText="Detalle del metodo" class="sapUiSmallMarginBottom">
+                            <VBox class="sapUiSmallMargin">
+                                <HBox wrap="Wrap" justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                                        <Title text="Datos principales" level="H5" />
+                                        <Text text="Configuracion base del metodo de inflacion seleccionado." />
+                                    </VBox>
+                                    <HBox wrap="Wrap" class="sapUiTinyMarginTop">
+                                        <ObjectStatus
+                                            text="{= ${methodsView>/currentMethod/active} ? 'Metodo activo' : 'Metodo inactivo' }"
+                                            state="{= ${methodsView>/currentMethod/active} ? 'Success' : 'Warning' }"
+                                            class="sapUiSmallMarginEnd sapUiTinyMarginBottom" />
+                                        <ObjectStatus
+                                            text="{= ${methodsView>/editMode} ? 'Modo edicion' : 'Modo visualizacion' }"
+                                            state="{= ${methodsView>/editMode} ? 'Information' : 'None' }"
+                                            class="sapUiTinyMarginBottom" />
+                                    </HBox>
+                                </HBox>
+
+                                <HBox wrap="Wrap" renderType="Bare">
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="14rem">
+                                        <Label text="Method ID" required="true" />
+                                        <Input value="{methodsView>/currentMethod/methodId}" editable="{methodsView>/editMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="16rem">
+                                        <Label text="Country" required="true" />
+                                        <Input value="{methodsView>/currentMethod/country}" editable="{methodsView>/editMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="16rem">
+                                        <Label text="Ledger" required="true" />
+                                        <Input value="{methodsView>/currentMethod/ledger}" editable="{methodsView>/editMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="16rem">
+                                        <Label text="Index Series" required="true" />
+                                        <Input value="{methodsView>/currentMethod/indexSeries}" editable="{methodsView>/editMode}" />
+                                    </VBox>
+                                </HBox>
+
+                                <HBox wrap="Wrap" renderType="Bare">
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="20rem">
+                                        <Label text="Description" />
+                                        <TextArea
+                                            value="{methodsView>/currentMethod/description}"
+                                            editable="{methodsView>/editMode}"
+                                            rows="3" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="16rem">
+                                        <Label text="Document Type" />
+                                        <Input value="{methodsView>/currentMethod/documentType}" editable="{methodsView>/editMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                        <Label text="Valid From" />
+                                        <DatePicker
+                                            value="{methodsView>/currentMethod/validFrom}"
+                                            valueFormat="yyyy-MM-dd"
+                                            displayFormat="medium"
+                                            editable="{methodsView>/editMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                        <Label text="Valid To" />
+                                        <DatePicker
+                                            value="{methodsView>/currentMethod/validTo}"
+                                            valueFormat="yyyy-MM-dd"
+                                            displayFormat="medium"
+                                            editable="{methodsView>/editMode}" />
+                                    </VBox>
+                                </HBox>
+
+                                <Title text="Comportamiento y estado" level="H5" class="sapUiTinyMarginTop sapUiTinyMarginBottom" />
+                                <HBox wrap="Wrap" renderType="Bare" alignItems="Center">
+                                    <VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                        <Label text="Monthly Reversal" />
+                                        <Switch state="{methodsView>/currentMethod/monthlyReversal}" enabled="{methodsView>/editMode}" />
+                                        <Text text="{= ${methodsView>/currentMethod/monthlyReversal} ? 'Con reversa mensual' : 'Sin reversa mensual' }" class="sapUiTinyMarginTop" />
+                                    </VBox>
+                                    <VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom" width="14rem">
+                                        <Label text="Year End No Reversal" />
+                                        <Switch state="{methodsView>/currentMethod/yearEndNoReversal}" enabled="{methodsView>/editMode}" />
+                                        <Text text="{= ${methodsView>/currentMethod/yearEndNoReversal} ? 'Sin reversa de cierre' : 'Reversible al cierre' }" class="sapUiTinyMarginTop" />
+                                    </VBox>
+                                    <VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom" width="10rem">
+                                        <Label text="Active" />
+                                        <Switch state="{methodsView>/currentMethod/active}" enabled="{methodsView>/editMode}" />
+                                        <ObjectStatus
+                                            text="{= ${methodsView>/currentMethod/active} ? 'Activo' : 'Inactivo' }"
+                                            state="{= ${methodsView>/currentMethod/active} ? 'Success' : 'Warning' }"
+                                            class="sapUiTinyMarginTop" />
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+                        </Panel>
+
+                        <Panel headerText="Asignaciones por sociedad">
+                            <VBox class="sapUiSmallMargin">
+                                <OverflowToolbar class="sapUiTinyMarginBottom">
+                                    <Title text="Asignaciones vigentes" level="H5" />
+                                    <ToolbarSpacer />
+                                    <Button
+                                        text="Agregar asignacion"
+                                        press=".onCreateAssignment"
+                                        enabled="{methodsView>/editMode}" />
+                                    <Button
+                                        text="Editar asignacion"
+                                        press=".onEditAssignment"
+                                        enabled="{= ${methodsView>/editMode} &amp;&amp; ${methodsView>/selectedAssignmentIndex} > -1 &amp;&amp; !${methodsView>/assignmentEditMode} }" />
+                                    <Button
+                                        text="Eliminar asignacion"
+                                        press=".onDeleteAssignment"
+                                        enabled="{= ${methodsView>/editMode} &amp;&amp; ${methodsView>/selectedAssignmentIndex} > -1 }" />
+                                </OverflowToolbar>
+
+                                <Text
+                                    text="Seleccione una sociedad para ver su detalle o cree una nueva asignacion en modo edicion."
+                                    class="sapUiTinyMarginBottom" />
+
+                                <Table
+                                    id="assignmentTable"
+                                    mode="SingleSelectLeft"
+                                    includeItemInSelection="true"
+                                    selectionChange=".onAssignmentSelectionChange"
+                                    items="{methodsView>/currentMethod/assignments}">
+                                    <columns>
+                                        <Column>
+                                            <Text text="Company Code" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="Method ID" />
+                                        </Column>
+                                        <Column hAlign="Center">
+                                            <Text text="Active" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="Valid From" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="Valid To" />
+                                        </Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Text text="{methodsView>companyCode}" />
+                                                <Text text="{methodsView>methodId}" />
+                                                <ObjectStatus
+                                                    text="{= ${methodsView>active} ? 'Yes' : 'No' }"
+                                                    state="{= ${methodsView>active} ? 'Success' : 'None' }" />
+                                                <Text text="{methodsView>validFrom}" />
+                                                <Text text="{methodsView>validTo}" />
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+
+                                <Title text="Detalle de asignacion" level="H5" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
+                                <HBox wrap="Wrap" renderType="Bare">
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="14rem">
+                                        <Label text="Company Code" required="true" />
+                                        <Input
+                                            value="{methodsView>/currentAssignment/companyCode}"
+                                            editable="{methodsView>/assignmentEditMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="14rem">
+                                        <Label text="Method ID" />
+                                        <Input value="{methodsView>/currentMethod/methodId}" editable="false" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="10rem">
+                                        <Label text="Active" />
+                                        <Switch
+                                            state="{methodsView>/currentAssignment/active}"
+                                            enabled="{methodsView>/assignmentEditMode}" />
+                                        <ObjectStatus
+                                            text="{= ${methodsView>/currentAssignment/active} ? 'Activa' : 'Inactiva' }"
+                                            state="{= ${methodsView>/currentAssignment/active} ? 'Success' : 'Warning' }"
+                                            class="sapUiTinyMarginTop" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                        <Label text="Valid From" />
+                                        <DatePicker
+                                            value="{methodsView>/currentAssignment/validFrom}"
+                                            valueFormat="yyyy-MM-dd"
+                                            displayFormat="medium"
+                                            editable="{methodsView>/assignmentEditMode}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="12rem">
+                                        <Label text="Valid To" />
+                                        <DatePicker
+                                            value="{methodsView>/currentAssignment/validTo}"
+                                            valueFormat="yyyy-MM-dd"
+                                            displayFormat="medium"
+                                            editable="{methodsView>/assignmentEditMode}" />
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+                        </Panel>
+                    </VBox>
+                </FlexBox>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>
